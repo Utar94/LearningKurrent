@@ -13,6 +13,8 @@ public record Sku
     Value = value.Trim();
   }
 
+  public static Sku? TryCreate(string? value) => string.IsNullOrWhiteSpace(value) ? null : new(value);
+
   private class Validator : AbstractValidator<Sku>
   {
     public Validator()

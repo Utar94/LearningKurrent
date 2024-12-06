@@ -21,21 +21,21 @@ public class ProductController : ControllerBase
   [HttpPost]
   public async Task<ActionResult> CreateAsync([FromBody] ProductPayload payload, CancellationToken cancellationToken)
   {
-    string id = Guid.NewGuid().ToString();
+    Guid id = Guid.NewGuid();
     await _mediator.Send(new CreateOrReplaceProductCommand(id, payload, Version: null), cancellationToken);
 
     return NoContent(); // TODO(fpion): 201 Created
   }
 
   [HttpDelete("{id}")]
-  public async Task<ActionResult> DeleteAsync(string id, CancellationToken cancellationToken)
+  public async Task<ActionResult> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
     await _mediator.Send(new DeleteProductCommand(id), cancellationToken);
     return NoContent(); // TODO(fpion): return type
   }
 
   [HttpGet("{id}")]
-  public async Task<ActionResult<ProductModel>> ReadAsync(string id, CancellationToken cancellationToken)
+  public async Task<ActionResult<ProductModel>> ReadAsync(Guid id, CancellationToken cancellationToken)
   {
     ProductModel? product = await _mediator.Send(new ReadProductQuery(id, Sku: null), cancellationToken);
     return product == null ? NotFound() : Ok(product);
@@ -49,7 +49,7 @@ public class ProductController : ControllerBase
   }
 
   [HttpPut("{id}")]
-  public async Task<ActionResult> ReplaceAsync(string id, [FromBody] ProductPayload payload, long? version, CancellationToken cancellationToken)
+  public async Task<ActionResult> ReplaceAsync(Guid id, [FromBody] ProductPayload payload, long? version, CancellationToken cancellationToken)
   {
     await _mediator.Send(new CreateOrReplaceProductCommand(id, payload, Version: null), cancellationToken);
     return NoContent(); // TODO(fpion): 201 Created or 200 OK
@@ -64,7 +64,7 @@ public class ProductController : ControllerBase
   }
 
   [HttpPatch("{id}")]
-  public async Task<ActionResult> UpdateAsync(string id, [FromBody] UpdateProductPayload payload, CancellationToken cancellationToken)
+  public async Task<ActionResult> UpdateAsync(Guid id, [FromBody] UpdateProductPayload payload, CancellationToken cancellationToken)
   {
     await _mediator.Send(new UpdateProductCommand(id, payload), cancellationToken);
     return NoContent(); // TODO(fpion): 200 OK

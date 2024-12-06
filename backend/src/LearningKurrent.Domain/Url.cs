@@ -13,6 +13,8 @@ public record Url
     Value = value.Trim();
   }
 
+  public static Url? TryCreate(string? value) => string.IsNullOrWhiteSpace(value) ? null : new(value);
+
   private class Validator : AbstractValidator<Url>
   {
     public Validator()

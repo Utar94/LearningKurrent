@@ -13,6 +13,8 @@ public record DisplayName
     Value = value.Trim();
   }
 
+  public static DisplayName? TryCreate(string? value) => string.IsNullOrWhiteSpace(value) ? null : new(value);
+
   private class Validator : AbstractValidator<DisplayName>
   {
     public Validator()

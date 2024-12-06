@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace LearningKurrent.Domain;
+﻿namespace LearningKurrent.Domain;
 
 public abstract class AggregateRoot : IAggregate
 {

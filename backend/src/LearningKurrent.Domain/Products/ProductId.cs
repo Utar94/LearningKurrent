@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace LearningKurrent.Domain.Products;
+﻿namespace LearningKurrent.Domain.Products;
 
 public readonly struct ProductId
 {
@@ -10,6 +8,16 @@ public readonly struct ProductId
   public ProductId(AggregateId aggregateId)
   {
     AggregateId = aggregateId;
+  }
+
+  public ProductId(Guid value)
+  {
+    AggregateId = new(value);
+  }
+
+  public ProductId(string value)
+  {
+    AggregateId = new(value);
   }
 
   public static ProductId NewId() => new(AggregateId.NewId());

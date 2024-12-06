@@ -1,5 +1,4 @@
 ﻿using Logitar;
-using System.Diagnostics.CodeAnalysis;
 
 namespace LearningKurrent.Domain;
 

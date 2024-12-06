@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace LearningKurrent.Application.Models;
+﻿namespace LearningKurrent.Application.Models;
 
 public class ActorModel
 {

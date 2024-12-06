@@ -13,7 +13,7 @@ public class Product : AggregateRoot
   public Price? Price { get; private set; }
   public Url? PictureUrl { get; private set; }
 
-  public Product(Sku sku, ActorId actorId, ProductId? id = null) : base((id ?? ProductId.NewId()).AggregateId)
+  public Product(Sku sku, ActorId? actorId, ProductId? id = null) : base((id ?? ProductId.NewId()).AggregateId)
   {
     Raise(new ProductCreated(sku), actorId);
   }
@@ -22,7 +22,7 @@ public class Product : AggregateRoot
     _sku = @event.Sku;
   }
 
-  public void Delete(ActorId actorId)
+  public void Delete(ActorId? actorId = null)
   {
     if (!IsDeleted)
     {
@@ -30,7 +30,7 @@ public class Product : AggregateRoot
     }
   }
 
-  public void Update(ProductUpdates updates, ActorId actorId)
+  public void Update(ProductUpdates updates, ActorId? actorId)
   {
     ProductUpdates delta = new();
     if (updates.Sku != null && updates.Sku != Sku)

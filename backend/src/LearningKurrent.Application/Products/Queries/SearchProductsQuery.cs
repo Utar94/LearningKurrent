@@ -8,9 +8,15 @@ public record SearchProductsQuery(SearchProductsPayload Payload) : IRequest<Sear
 
 internal class SearchProductsQueryHandler : IRequestHandler<SearchProductsQuery, SearchResults<ProductModel>>
 {
-  public Task<SearchResults<ProductModel>> Handle(SearchProductsQuery query, CancellationToken cancellationToken)
+  private readonly IProductQuerier _productQuerier;
+
+  public SearchProductsQueryHandler(IProductQuerier productQuerier)
   {
-    SearchResults<ProductModel> results = new();
-    return Task.FromResult(results); // TODO(fpion): implement
+    _productQuerier = productQuerier;
+  }
+
+  public async Task<SearchResults<ProductModel>> Handle(SearchProductsQuery query, CancellationToken cancellationToken)
+  {
+    return await _productQuerier.SearchAsync(query.Payload, cancellationToken);
   }
 }

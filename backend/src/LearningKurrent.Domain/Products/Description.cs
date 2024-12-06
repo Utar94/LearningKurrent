@@ -13,6 +13,8 @@ public record Description
     Value = value.Trim();
   }
 
+  public static Description? TryCreate(string? value) => string.IsNullOrWhiteSpace(value) ? null : new(value);
+
   private class Validator : AbstractValidator<Description>
   {
     public Validator()

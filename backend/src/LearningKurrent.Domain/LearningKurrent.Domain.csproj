@@ -19,4 +19,9 @@
     <PackageReference Include="Logitar" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="System.Diagnostics.CodeAnalysis" />
+    <Using Include="System.Reflection" />
+  </ItemGroup>
+
 </Project>
