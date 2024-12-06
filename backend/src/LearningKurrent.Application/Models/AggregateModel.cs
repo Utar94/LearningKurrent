@@ -2,7 +2,7 @@
 
 public abstract class AggregateModel
 {
-  public Guid Id { get; set; }
+  public string Id { get; set; } = string.Empty;
   public long Version { get; set; }
 
   public ActorModel CreatedBy { get; set; } = new();
