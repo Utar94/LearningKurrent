@@ -1,4 +1,6 @@
-﻿using LearningKurrent.Application.Products.Models;
+﻿using FluentValidation;
+using LearningKurrent.Application.Products.Models;
+using LearningKurrent.Application.Products.Validators;
 using LearningKurrent.Domain;
 using LearningKurrent.Domain.Products;
 using MediatR;
@@ -21,13 +23,13 @@ internal class UpdateProductCommandHandler : IRequestHandler<UpdateProductComman
   public async Task Handle(UpdateProductCommand command, CancellationToken cancellationToken)
   {
     UpdateProductPayload payload = command.Payload;
-    // TODO(fpion): validate
+    new UpdateProductValidator().ValidateAndThrow(payload);
 
     ProductId id = new(command.Id);
     Product product = await _productRepository.LoadAsync(id, cancellationToken) ?? throw new ProductNotFoundException(id);
 
     ProductUpdates updates = new()
-  {
+    {
       Sku = Sku.TryCreate(payload.Sku),
       DisplayName = payload.DisplayName == null ? null : new Change<DisplayName>(DisplayName.TryCreate(payload.DisplayName.Value)),
       Description = payload.Description == null ? null : new Change<Description>(Description.TryCreate(payload.Description.Value)),
