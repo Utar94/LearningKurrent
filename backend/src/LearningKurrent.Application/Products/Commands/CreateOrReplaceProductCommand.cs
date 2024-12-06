@@ -65,7 +65,7 @@ internal class CreateOrReplaceProductCommandHandler : IRequestHandler<CreateOrRe
     }
     Url? pictureUrl = Url.TryCreate(payload.PictureUrl);
     if (reference.PictureUrl != pictureUrl)
-    {
+  {
       updates.PictureUrl = new Change<Url>(pictureUrl);
     }
     product.Update(updates, _applicationContext.ActorId);

@@ -27,7 +27,7 @@ internal class UpdateProductCommandHandler : IRequestHandler<UpdateProductComman
     Product product = await _productRepository.LoadAsync(id, cancellationToken) ?? throw new ProductNotFoundException(id);
 
     ProductUpdates updates = new()
-    {
+  {
       Sku = Sku.TryCreate(payload.Sku),
       DisplayName = payload.DisplayName == null ? null : new Change<DisplayName>(DisplayName.TryCreate(payload.DisplayName.Value)),
       Description = payload.Description == null ? null : new Change<Description>(Description.TryCreate(payload.Description.Value)),
