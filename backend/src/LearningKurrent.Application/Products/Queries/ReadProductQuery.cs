@@ -3,12 +3,43 @@ using MediatR;
 
 namespace LearningKurrent.Application.Products.Queries;
 
-public record ReadProductQuery(string? Id, string? Sku) : IRequest<ProductModel?>;
+public record ReadProductQuery(Guid? Id, string? Sku) : IRequest<ProductModel?>;
 
 internal class ReadProductQueryHandler : IRequestHandler<ReadProductQuery, ProductModel?>
 {
-  public Task<ProductModel?> Handle(ReadProductQuery query, CancellationToken cancellationToken)
+  private readonly IProductQuerier _productQuerier;
+
+  public ReadProductQueryHandler(IProductQuerier productQuerier)
   {
-    return Task.FromResult<ProductModel?>(null); // TODO(fpion): implement
+    _productQuerier = productQuerier;
+  }
+
+  public async Task<ProductModel?> Handle(ReadProductQuery query, CancellationToken cancellationToken)
+  {
+    Dictionary<Guid, ProductModel> products = new(capacity: 2);
+
+    if (query.Id.HasValue)
+    {
+      ProductModel? product = await _productQuerier.ReadAsync(query.Id.Value, cancellationToken);
+      if (product != null)
+      {
+        products[product.Id] = product;
+      }
+    }
+    if (!string.IsNullOrWhiteSpace(query.Sku))
+    {
+      ProductModel? product = await _productQuerier.ReadAsync(query.Sku, cancellationToken);
+      if (product != null)
+      {
+        products[product.Id] = product;
+      }
+    }
+
+    if (products.Count > 1)
+    {
+      throw TooManyResultsException<ProductModel>.ExpectedSingle(products.Count);
+    }
+
+    return products.SingleOrDefault().Value;
   }
 }

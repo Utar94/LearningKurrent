@@ -1,8 +1,11 @@
-﻿namespace LearningKurrent;
+﻿using LearningKurrent.Infrastructure.Commands;
+using MediatR;
+
+namespace LearningKurrent;
 
 internal static class Program
 {
-  public static void Main(string[] args)
+  public static async Task Main(string[] args)
   {
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,13 @@ internal static class Program
     WebApplication application = builder.Build();
 
     startup.Configure(application);
+
+    if (application.Configuration.GetValue<bool>("EnableMigrations"))
+    {
+      using IServiceScope scope = application.Services.CreateScope();
+      IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+      await mediator.Send(new InitializeDatabaseCommand());
+    }
 
     application.Run();
   }
