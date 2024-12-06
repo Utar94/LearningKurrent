@@ -33,9 +33,32 @@ internal class ProductRepository : IProductRepository
   {
     return await LoadAsync(id, version: null, cancellationToken);
   }
-  public Task<Product?> LoadAsync(ProductId id, long? version, CancellationToken cancellationToken)
+  public async Task<Product?> LoadAsync(ProductId id, long? version, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    EventStoreClient.ReadStreamResult events = _client.ReadStreamAsync(
+      direction: Direction.Forwards,
+      streamName: id.Value,
+      revision: version.HasValue ? StreamPosition.FromInt64(version.Value) : StreamPosition.Start,
+      cancellationToken: cancellationToken);
+
+    if (await events.ReadState == ReadState.StreamNotFound)
+    {
+      return null;
+    }
+
+    List<IEvent> domainEvents = [];
+    await foreach (ResolvedEvent @event in events)
+    {
+      Type eventType = Type.GetType(@event.Event.EventType)
+        ?? throw new InvalidOperationException($"The type '{@event.Event.EventType}' could not be resolved.");
+
+      string json = Encoding.UTF8.GetString(@event.Event.Data.ToArray());
+      IEvent domainEvent = JsonSerializer.Deserialize(json, eventType, _serializerOptions) as IEvent
+        ?? throw new InvalidOperationException($"The specified event could not be deserialized.{Environment.NewLine}JSON: {json}");
+      domainEvents.Add(domainEvent);
+    }
+
+    return AggregateRoot.LoadFromChanges<Product>(id.AggregateId, domainEvents);
   }
 
   public async Task SaveAsync(Product product, CancellationToken cancellationToken)

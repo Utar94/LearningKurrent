@@ -13,6 +13,10 @@ public class Product : AggregateRoot
   public Price? Price { get; private set; }
   public Url? PictureUrl { get; private set; }
 
+  public Product() : base()
+  {
+  }
+
   public Product(Sku sku, ActorId? actorId, ProductId? id = null) : base((id ?? ProductId.NewId()).AggregateId)
   {
     Raise(new ProductCreated(sku), actorId);

@@ -2,7 +2,7 @@
 
 public abstract class AggregateRoot : IAggregate
 {
-  public AggregateId Id { get; }
+  public AggregateId Id { get; private set; }
   public long Version { get; private set; }
 
   public ActorId? CreatedBy { get; private set; }
@@ -32,6 +32,21 @@ public abstract class AggregateRoot : IAggregate
     {
       Id = AggregateId.NewId();
     }
+  }
+
+  public static T LoadFromChanges<T>(AggregateId id, IEnumerable<IEvent> events) where T : AggregateRoot, new()
+  {
+    T aggregate = new()
+    {
+      Id = id
+    };
+
+    foreach (IEvent @event in events)
+    {
+      aggregate.Apply(@event);
+    }
+
+    return aggregate;
   }
 
   protected void Raise(IEvent @event, ActorId? actorId = null, DateTime? occurredOn = null)
