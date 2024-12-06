@@ -36,8 +36,8 @@ internal class ReadProductQueryHandler : IRequestHandler<ReadProductQuery, Produ
     }
 
     if (products.Count > 1)
-  {
-      throw new NotImplementedException(); // TODO(fpion): too many results
+    {
+      throw TooManyResultsException<ProductModel>.ExpectedSingle(products.Count);
     }
 
     return products.SingleOrDefault().Value;
