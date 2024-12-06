@@ -42,9 +42,29 @@ internal class ProductQuerier : IProductQuerier
     return product == null ? null : await MapAsync(product, cancellationToken);
   }
 
-  public Task<SearchResults<ProductModel>> SearchAsync(SearchProductsPayload payload, CancellationToken cancellationToken)
+  public async Task<SearchResults<ProductModel>> SearchAsync(SearchProductsPayload payload, CancellationToken cancellationToken)
   {
-    throw new NotImplementedException(); // TODO(fpion): implement
+    // TODO(fpion): filters
+
+    IQueryable<ProductEntity> query = _products.AsNoTracking();
+
+    // TODO(fpion): sorting
+
+    long total = await query.LongCountAsync(cancellationToken);
+
+    if (payload.Skip > 0)
+    {
+      query = query.Skip(payload.Skip);
+    }
+    if (payload.Limit > 0)
+    {
+      query = query.Take(payload.Limit);
+    }
+
+    ProductEntity[] entities = await query.ToArrayAsync(cancellationToken);
+    IReadOnlyCollection<ProductModel> products = await MapAsync(entities, cancellationToken);
+
+    return new SearchResults<ProductModel>(products, total);
   }
 
   private async Task<ProductModel> MapAsync(ProductEntity product, CancellationToken cancellationToken)

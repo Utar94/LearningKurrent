@@ -23,15 +23,14 @@ public class ProductController : ControllerBase
   {
     Guid id = Guid.NewGuid();
     await _mediator.Send(new CreateOrReplaceProductCommand(id, payload, Version: null), cancellationToken);
-
-    return NoContent(); // TODO(fpion): 201 Created
+    return Created(GetLocation(id), new ProductResult(id));
   }
 
   [HttpDelete("{id}")]
   public async Task<ActionResult> DeleteAsync(Guid id, CancellationToken cancellationToken)
   {
     await _mediator.Send(new DeleteProductCommand(id), cancellationToken);
-    return NoContent(); // TODO(fpion): return type
+    return NoContent();
   }
 
   [HttpGet("{id}")]
@@ -51,8 +50,9 @@ public class ProductController : ControllerBase
   [HttpPut("{id}")]
   public async Task<ActionResult> ReplaceAsync(Guid id, [FromBody] ProductPayload payload, long? version, CancellationToken cancellationToken)
   {
-    await _mediator.Send(new CreateOrReplaceProductCommand(id, payload, Version: null), cancellationToken);
-    return NoContent(); // TODO(fpion): 201 Created or 200 OK
+    bool created = await _mediator.Send(new CreateOrReplaceProductCommand(id, payload, version), cancellationToken);
+    ProductResult result = new(id);
+    return created ? Created(GetLocation(id), result) : Ok(result);
   }
 
   [HttpGet]
@@ -67,6 +67,10 @@ public class ProductController : ControllerBase
   public async Task<ActionResult> UpdateAsync(Guid id, [FromBody] UpdateProductPayload payload, CancellationToken cancellationToken)
   {
     await _mediator.Send(new UpdateProductCommand(id, payload), cancellationToken);
-    return NoContent(); // TODO(fpion): 200 OK
+    return NoContent();
   }
+
+  private Uri GetLocation(Guid id) => new($"https://{Request.Host}/products/{id}", UriKind.Absolute);
 }
+
+public record ProductResult(Guid Id);

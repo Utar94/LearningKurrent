@@ -7,9 +7,9 @@ using MediatR;
 
 namespace LearningKurrent.Application.Products.Commands;
 
-public record CreateOrReplaceProductCommand(Guid? Id, ProductPayload Payload, long? Version) : IRequest;
+public record CreateOrReplaceProductCommand(Guid? Id, ProductPayload Payload, long? Version) : IRequest<bool>;
 
-internal class CreateOrReplaceProductCommandHandler : IRequestHandler<CreateOrReplaceProductCommand>
+internal class CreateOrReplaceProductCommandHandler : IRequestHandler<CreateOrReplaceProductCommand, bool>
 {
   private readonly IApplicationContext _applicationContext;
   private readonly IProductRepository _productRepository;
@@ -20,7 +20,7 @@ internal class CreateOrReplaceProductCommandHandler : IRequestHandler<CreateOrRe
     _productRepository = productRepository;
   }
 
-  public async Task Handle(CreateOrReplaceProductCommand command, CancellationToken cancellationToken)
+  public async Task<bool> Handle(CreateOrReplaceProductCommand command, CancellationToken cancellationToken)
   {
     ProductPayload payload = command.Payload;
     new ProductValidator().ValidateAndThrow(payload);
@@ -29,6 +29,7 @@ internal class CreateOrReplaceProductCommandHandler : IRequestHandler<CreateOrRe
 
     ProductId? id = command.Id.HasValue ? new(command.Id.Value) : null;
     Product? product = id.HasValue ? await _productRepository.LoadAsync(id.Value, cancellationToken) : null;
+    bool created = false;
     if (product == null)
     {
       if (command.Version.HasValue)
@@ -37,6 +38,7 @@ internal class CreateOrReplaceProductCommandHandler : IRequestHandler<CreateOrRe
       }
 
       product = new Product(sku, _applicationContext.ActorId, id);
+      created = true;
     }
 
     Product reference = (command.Version.HasValue
@@ -65,7 +67,7 @@ internal class CreateOrReplaceProductCommandHandler : IRequestHandler<CreateOrRe
     }
     Url? pictureUrl = Url.TryCreate(payload.PictureUrl);
     if (reference.PictureUrl != pictureUrl)
-  {
+    {
       updates.PictureUrl = new Change<Url>(pictureUrl);
     }
     product.Update(updates, _applicationContext.ActorId);
@@ -73,5 +75,7 @@ internal class CreateOrReplaceProductCommandHandler : IRequestHandler<CreateOrRe
     // TODO(fpion): ensure SKU unicity
 
     await _productRepository.SaveAsync(product, cancellationToken);
+
+    return created;
   }
 }
