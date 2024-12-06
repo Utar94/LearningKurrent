@@ -1,3 +1,5 @@
-﻿namespace LearningKurrent.Domain.Products.Events;
+﻿using MediatR;
 
-public record ProductDeleted : DomainEvent, IDeleteEvent;
+namespace LearningKurrent.Domain.Products.Events;
+
+public record ProductDeleted : DomainEvent, IDeleteEvent, INotification;

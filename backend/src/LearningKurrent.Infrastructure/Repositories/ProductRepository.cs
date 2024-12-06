@@ -4,6 +4,7 @@ using LearningKurrent.Domain;
 using LearningKurrent.Domain.Products;
 using LearningKurrent.Infrastructure.Converters;
 using Logitar;
+using MediatR;
 
 namespace LearningKurrent.Infrastructure.Repositories;
 
@@ -23,10 +24,12 @@ internal class ProductRepository : IProductRepository
   }
 
   private readonly EventStoreClient _client;
+  private readonly IPublisher _publisher;
 
-  public ProductRepository(EventStoreClient client)
+  public ProductRepository(EventStoreClient client, IPublisher publisher)
   {
     _client = client;
+    _publisher = publisher;
   }
 
   public async Task<Product?> LoadAsync(ProductId id, CancellationToken cancellationToken)
@@ -67,9 +70,14 @@ internal class ProductRepository : IProductRepository
     {
       await _client.AppendToStreamAsync(
         streamName: product.Id.Value,
-        expectedRevision: StreamRevision.FromInt64(product.Version),
+        expectedRevision: StreamRevision.FromInt64(product.Version - product.Changes.Count - 1),
         eventData: product.Changes.Select(ToEventData),
         cancellationToken: cancellationToken);
+
+      foreach (IEvent change in product.Changes)
+      {
+        await _publisher.Publish(change, cancellationToken);
+      }
 
       product.ClearChanges();
     }

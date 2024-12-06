@@ -21,6 +21,7 @@ public static class DependencyInjectionExtensions
         string connectionString = serviceProvider.GetConnectionString(SqlServerKey);
         options.UseSqlServer(connectionString, options => options.MigrationsAssembly("LearningKurrent.Infrastructure"));
       })
+      .AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
       .AddScoped(serviceProvider =>
       {
         string connectionString = serviceProvider.GetConnectionString(EventStoreKey);

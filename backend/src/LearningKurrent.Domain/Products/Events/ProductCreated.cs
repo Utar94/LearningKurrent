@@ -1,3 +1,5 @@
-﻿namespace LearningKurrent.Domain.Products.Events;
+﻿using MediatR;
 
-public record ProductCreated(Sku Sku) : DomainEvent;
+namespace LearningKurrent.Domain.Products.Events;
+
+public record ProductCreated(Sku Sku) : DomainEvent, INotification;

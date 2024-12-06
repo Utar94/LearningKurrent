@@ -73,7 +73,7 @@ public abstract class AggregateRoot : IAggregate
 
   protected void Apply(IEvent @event)
   {
-    Handle(@event);
+    Dispatch(@event);
 
     if (@event is DomainEvent domainEvent)
     {
@@ -129,7 +129,7 @@ public abstract class AggregateRoot : IAggregate
     }
   }
 
-  protected virtual void Handle(IEvent @event)
+  protected virtual void Dispatch(IEvent @event)
   {
     MethodInfo? handle = GetType().GetMethod("Handle", BindingFlags.Instance | BindingFlags.NonPublic, [@event.GetType()]);
     handle?.Invoke(this, [@event]);

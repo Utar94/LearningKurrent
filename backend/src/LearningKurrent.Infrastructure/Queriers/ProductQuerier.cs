@@ -17,9 +17,10 @@ internal class ProductQuerier : IProductQuerier
     _products = context.Products;
   }
 
-  public async Task<ProductModel?> ReadAsync(Product product, CancellationToken cancellationToken)
+  public async Task<ProductModel> ReadAsync(Product product, CancellationToken cancellationToken)
   {
-    return await ReadAsync(product.Id, cancellationToken);
+    return await ReadAsync(product.Id, cancellationToken)
+      ?? throw new InvalidOperationException($"The product entity 'Id={product.Id.ToGuid()}' could not be found."); ;
   }
   public async Task<ProductModel?> ReadAsync(ProductId id, CancellationToken cancellationToken)
   {
