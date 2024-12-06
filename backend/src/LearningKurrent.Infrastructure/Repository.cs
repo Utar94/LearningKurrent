@@ -1,5 +1,4 @@
 ﻿using EventStore.Client;
-using System.Text;
 
 namespace LearningKurrent.Infrastructure;
 
@@ -11,31 +10,6 @@ internal class Repository
   {
     EventStoreClientSettings settings = EventStoreClientSettings.Create(connectionString);
     EventStoreClient client = new(settings);
-
-    EventData data = new(
-      eventId: Uuid.NewUuid(),
-      type: "EventType",
-      data: Array.Empty<byte>(),
-      metadata: Array.Empty<byte>(),
-      contentType: "application/json");
-
-    IWriteResult result = await client.AppendToStreamAsync(
-      streamName: "some-stream",
-      expectedState: StreamState.Any,
-      eventData: [data],
-      configureOperationOptions: null,
-      deadline: null,
-      userCredentials: null,
-      cancellationToken: cancellationToken);
-
-    result = await client.AppendToStreamAsync(
-      streamName: "some-stream",
-      expectedRevision: StreamRevision.FromInt64(7),
-      eventData: [data],
-      configureOperationOptions: null,
-      deadline: null,
-      userCredentials: null,
-      cancellationToken: cancellationToken);
 
     EventStoreClient.ReadStreamResult events = client.ReadStreamAsync(
       direction: Direction.Forwards,
