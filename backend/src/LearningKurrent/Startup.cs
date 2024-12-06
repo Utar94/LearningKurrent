@@ -1,4 +1,6 @@
-﻿using Scalar.AspNetCore;
+﻿using LearningKurrent.Application;
+using LearningKurrent.Infrastructure;
+using Scalar.AspNetCore;
 
 namespace LearningKurrent;
 
@@ -21,6 +23,9 @@ internal class Startup : StartupBase
     {
       services.AddOpenApi();
     }
+
+    services.AddLearningKurrentApplication();
+    services.AddLearningKurrentInfrastructure();
   }
 
   public override void Configure(IApplicationBuilder builder)
