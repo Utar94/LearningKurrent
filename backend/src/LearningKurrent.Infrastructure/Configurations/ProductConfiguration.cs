@@ -25,7 +25,7 @@ internal class ProductConfiguration : AggregateConfiguration<ProductEntity>, IEn
     builder.Property(x => x.SkuNormalized).HasMaxLength(Sku.MaximumLength);
     builder.Property(x => x.DisplayName).HasMaxLength(DisplayName.MaximumLength);
     builder.Property(x => x.Description).HasMaxLength(Description.MaximumLength);
-    builder.Property(x => x.Price).HasColumnType("MONEY");
+    builder.Property(x => x.Price).HasColumnType("money");
     builder.Property(x => x.PictureUrl).HasMaxLength(Url.MaximumLength);
   }
 }

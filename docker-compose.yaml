@@ -1,2 +1,42 @@
-name: learningkurrent
-#services:
+name: learning_kurrent
+services:
+  learning_kurrent_mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: LearningKurrent_mssql
+    restart: unless-stopped
+    user: root
+    environment:
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: gq2rczbJUA8TGD4F
+    ports:
+      - 41433:1433
+    volumes:
+      - mssql_backup:/var/opt/mssql/backup
+      - mssql_data:/var/opt/mssql/data
+      - mssql_log:/var/opt/mssql/log
+
+  learning_kurrent_eventstore:
+    image: docker.eventstore.com/eventstore-preview/eventstoredb-ee:24.10.0-preview1-x64-8.0-bookworm-slim
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=1
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+      - EVENTSTORE_NODE_PORT=2113
+      - EVENTSTORE_INSECURE=true
+      - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+    ports:
+      - 42113:2113
+    volumes:
+      - type: volume
+        source: eventstore-volume-data
+        target: /var/lib/eventstore
+      - type: volume
+        source: eventstore-volume-logs
+        target: /var/log/eventstore
+
+volumes:
+  eventstore-volume-data:
+  eventstore-volume-logs:
+  mssql_backup:
+  mssql_data:
+  mssql_log:

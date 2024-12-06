@@ -26,6 +26,7 @@ internal class Startup : StartupBase
 
     services.AddLearningKurrentApplication();
     services.AddLearningKurrentInfrastructure();
+    services.AddSingleton<IApplicationContext, HttpApplicationContext>();
   }
 
   public override void Configure(IApplicationBuilder builder)
